@@ -1,6 +1,6 @@
 # SPEC 01 — Arquitectura general del traductor por voz
 
-> **Status:** Draft
+> **Status:** Implementado
 > **Depends on:** (ninguno — spec fundacional)
 > **Date:** 2026-09-25
 > **Objective:** Definir la arquitectura de componentes, el flujo de datos extremo a extremo y el roadmap de specs para un traductor de voz en tiempo real (React ↔ Spring Boot ↔ servicio de IA/audio), sin escribir código todavía.
@@ -111,12 +111,12 @@ Este spec no tiene plan de implementación de código — su único entregable e
 
 ## Acceptance criteria
 
-- [ ] El documento define los tres componentes (Frontend, Backend, Servicio de IA/audio) y sus relaciones.
-- [ ] El documento describe el flujo completo de una interacción de voz en ambos sentidos.
-- [ ] El documento dice explícitamente que el texto es auxiliar y la voz es el mecanismo principal.
-- [ ] El documento fija que el par de idiomas es un parámetro, no un valor hardcodeado en la lógica.
-- [ ] El roadmap de specs 02–10 está en el documento y cada uno tiene un alcance de una línea.
-- [ ] Ningún spec posterior necesita redefinir estos principios — solo puede referenciarlos.
+- [x] El documento define los tres componentes (Frontend, Backend, Servicio de IA/audio) y sus relaciones.
+- [x] El documento describe el flujo completo de una interacción de voz en ambos sentidos.
+- [x] El documento dice explícitamente que el texto es auxiliar y la voz es el mecanismo principal.
+- [x] El documento fija que el par de idiomas es un parámetro, no un valor hardcodeado en la lógica.
+- [x] El roadmap de specs 02–10 está en el documento y cada uno tiene un alcance de una línea.
+- [x] Ningún spec posterior necesita redefinir estos principios — solo puede referenciarlos.
 
 ## Decisiones
 
