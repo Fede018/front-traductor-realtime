@@ -1,6 +1,6 @@
 # SPEC 01 — Arquitectura general del traductor por voz
 
-> **Status:** Draft
+> **Status:** Aprobado
 > **Depends on:** (ninguno — spec fundacional)
 > **Date:** 2026-09-25
 > **Objective:** Definir la arquitectura de componentes, el flujo de datos extremo a extremo y el roadmap de specs para un traductor de voz en tiempo real (React ↔ Spring Boot ↔ servicio de IA/audio), sin escribir código todavía.
@@ -84,18 +84,18 @@ El mismo flujo aplica en sentido inverso (Persona B → Persona A) sin cambios e
 
 ## Roadmap de specs (referencia — no implementar acá)
 
-| Spec | Título | Entregable |
-|------|--------|------------|
-| 01 | Arquitectura (este spec) | Documento de arquitectura, sin código |
-| 02 | Backend Spring Boot | `back-traduct` con dependencias, estructura de paquetes, CORS, endpoint de health, manejo básico de errores |
-| 03 | Frontend React | `front-traduct` con pantalla principal centrada en voz (mockup conceptual), sin IA real |
-| 04 | Captura de audio | Grabar/reproducir audio en el navegador (MediaRecorder), sin backend todavía |
-| 05 | Enviar audio al backend | Contrato REST definido, frontend envía audio, backend confirma recepción, sin traducir |
-| 06 | Speech-to-Text | Integración Whisper: audio → texto |
-| 07 | Traducción | Texto origen → texto destino |
-| 08 | Text-to-Speech | Texto destino → audio (Piper): primer flujo completo end-to-end |
-| 09 | Conversación bidireccional | UI y backend soportan ambos sentidos (A→B y B→A) con historial visible |
-| 10 | Tiempo real | Streaming/WebSocket para reducir latencia percibida |
+| Spec | Título                     | Entregable                                                                                                  |
+| ---- | -------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| 01   | Arquitectura (este spec)   | Documento de arquitectura, sin código                                                                       |
+| 02   | Backend Spring Boot        | `back-traduct` con dependencias, estructura de paquetes, CORS, endpoint de health, manejo básico de errores |
+| 03   | Frontend React             | `front-traduct` con pantalla principal centrada en voz (mockup conceptual), sin IA real                     |
+| 04   | Captura de audio           | Grabar/reproducir audio en el navegador (MediaRecorder), sin backend todavía                                |
+| 05   | Enviar audio al backend    | Contrato REST definido, frontend envía audio, backend confirma recepción, sin traducir                      |
+| 06   | Speech-to-Text             | Integración Whisper: audio → texto                                                                          |
+| 07   | Traducción                 | Texto origen → texto destino                                                                                |
+| 08   | Text-to-Speech             | Texto destino → audio (Piper): primer flujo completo end-to-end                                             |
+| 09   | Conversación bidireccional | UI y backend soportan ambos sentidos (A→B y B→A) con historial visible                                      |
+| 10   | Tiempo real                | Streaming/WebSocket para reducir latencia percibida                                                         |
 
 Cada spec de esta tabla se redacta en detalle (con sus propias preguntas de clarificación) cuando llegue su turno — esta tabla fija el orden y el alcance macro para que no se mezclen etapas.
 
