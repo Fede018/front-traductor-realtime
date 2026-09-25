@@ -1,26 +1,39 @@
 import { useCallback, useRef, useState } from "react";
+import { uploadAudio, type AudioUploadResponse } from "../api/audioClient";
+import type { LanguagePair } from "../types/language";
 
-export type InteractionState = "idle" | "recording" | "ready" | "error";
+export type InteractionState =
+  | "idle"
+  | "recording"
+  | "sending"
+  | "sent"
+  | "error";
 
 export interface VoiceRecorderState {
   state: InteractionState;
-  audioUrl: string | null;
+  audioUrl: string | null; // se mantiene para reproducción local (SPEC 04)
+  uploadResult: AudioUploadResponse | null;
   errorMessage: string | null;
 }
 
 const PREFERRED_MIME_TYPE = "audio/webm;codecs=opus";
 
-export function useVoiceRecorder(): VoiceRecorderState & {
+export function useVoiceRecorder(
+  languagePair: LanguagePair
+): VoiceRecorderState & {
   startRecording: () => void;
   stopRecording: () => void;
 } {
   const [state, setState] = useState<InteractionState>("idle");
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [uploadResult, setUploadResult] = useState<AudioUploadResponse | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const languagePairRef = useRef(languagePair);
+  languagePairRef.current = languagePair;
 
   const startRecording = useCallback(() => {
     if (
@@ -58,7 +71,21 @@ export function useVoiceRecorder(): VoiceRecorderState & {
             type: mediaRecorder.mimeType || PREFERRED_MIME_TYPE,
           });
           setAudioUrl(URL.createObjectURL(blob));
-          setState("ready");
+          setUploadResult(null);
+          setState("sending");
+
+          const { source, target } = languagePairRef.current;
+          uploadAudio(blob, source, target)
+            .then((result) => {
+              setUploadResult(result);
+              setState("sent");
+            })
+            .catch((error: unknown) => {
+              setErrorMessage(
+                error instanceof Error ? error.message : "No se pudo subir el audio."
+              );
+              setState("error");
+            });
         };
 
         mediaRecorderRef.current = mediaRecorder;
@@ -77,5 +104,5 @@ export function useVoiceRecorder(): VoiceRecorderState & {
     streamRef.current = null;
   }, []);
 
-  return { state, audioUrl, errorMessage, startRecording, stopRecording };
+  return { state, audioUrl, uploadResult, errorMessage, startRecording, stopRecording };
 }
