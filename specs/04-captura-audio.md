@@ -1,6 +1,6 @@
 # SPEC 04 — Captura de audio real en el navegador
 
-> **Status:** Draft
+> **Status:** Aprobado
 > **Depends on:** SPEC 03
 > **Date:** 2026-09-25
 > **Objective:** Reemplazar el hook mock del SPEC 03 por captura real de audio del micrófono (MediaRecorder) con reproducción local, sin enviar nada al backend todavía.
@@ -31,7 +31,7 @@ export type InteractionState = "idle" | "recording" | "ready" | "error";
 
 export interface VoiceRecorderState {
   state: InteractionState;
-  audioUrl: string | null;     // URL.createObjectURL(blob) del audio grabado, null si no hay
+  audioUrl: string | null; // URL.createObjectURL(blob) del audio grabado, null si no hay
   errorMessage: string | null; // solo tiene valor cuando state === "error"
 }
 ```
