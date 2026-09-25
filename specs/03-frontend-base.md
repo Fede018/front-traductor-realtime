@@ -1,6 +1,6 @@
 # SPEC 03 — Frontend base (React + Vite)
 
-> **Status:** Draft
+> **Status:** Implementado
 > **Depends on:** SPEC 01
 > **Date:** 2026-09-25
 > **Objective:** Scaffoldear `front-traduct` con Vite + React + TypeScript y armar la pantalla principal centrada en voz (mockup conceptual, con estados mockeados), sin integrar IA ni backend todavía.
@@ -58,8 +58,8 @@ export interface LanguagePair {
 export type InteractionState = "idle" | "recording" | "processing" | "result";
 
 export interface MockResult {
-  transcript: string;   // ejemplo: "Hola, ¿cómo estás?"
-  translation: string;  // ejemplo: "Olá, como você está?"
+  transcript: string; // ejemplo: "Hola, ¿cómo estás?"
+  translation: string; // ejemplo: "Olá, como você está?"
 }
 ```
 
@@ -79,12 +79,12 @@ Todo el estado es local a React (`useState`), sin persistencia — se descarta a
 
 ## Acceptance criteria
 
-- [ ] `npm run dev` sirve la app en `http://localhost:5173` sin errores en consola.
-- [ ] `npm run build` compila sin errores de TypeScript.
-- [ ] La pantalla muestra selector de idioma origen/destino con ES/PT/EN/FR, par por defecto ES→PT, y botón swap que invierte el par.
-- [ ] Mantener presionado el botón de micrófono pasa a estado "Grabando...", soltar pasa a "Procesando..." y luego muestra transcripción + traducción de ejemplo en el panel de conversación.
-- [ ] No hay ningún campo de texto para escribir el mensaje a traducir — la única entrada es el botón de micrófono.
-- [ ] No hay llamadas HTTP a ningún backend — todo el estado es mock local.
+- [x] `npm run dev` sirve la app en `http://localhost:5173` sin errores en consola.
+- [x] `npm run build` compila sin errores de TypeScript.
+- [x] La pantalla muestra selector de idioma origen/destino con ES/PT/EN/FR, par por defecto ES→PT, y botón swap que invierte el par.
+- [x] Mantener presionado el botón de micrófono pasa a estado "Grabando...", soltar pasa a "Procesando..." y luego muestra transcripción + traducción de ejemplo en el panel de conversación.
+- [x] No hay ningún campo de texto para escribir el mensaje a traducir — la única entrada es el botón de micrófono.
+- [x] No hay llamadas HTTP a ningún backend — todo el estado es mock local.
 
 ## Decisiones
 
