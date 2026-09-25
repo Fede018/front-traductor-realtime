@@ -1,6 +1,6 @@
 # SPEC 05 — Enviar audio al backend
 
-> **Status:** Draft
+> **Status:** Aprobado
 > **Depends on:** SPEC 02, SPEC 04
 > **Date:** 2026-09-25
 > **Objective:** Definir el contrato REST `POST /api/audio` y conectar el frontend para que, al soltar el botón de micrófono, el audio grabado se suba automáticamente al backend y este confirme la recepción, sin transcribir ni traducir todavía.
@@ -56,11 +56,16 @@ export interface AudioUploadResponse {
 
 ```ts
 // src/hooks/useVoiceRecorder.ts (ampliado)
-export type InteractionState = "idle" | "recording" | "sending" | "sent" | "error";
+export type InteractionState =
+  | "idle"
+  | "recording"
+  | "sending"
+  | "sent"
+  | "error";
 
 export interface VoiceRecorderState {
   state: InteractionState;
-  audioUrl: string | null;              // se mantiene para reproducción local (SPEC 04)
+  audioUrl: string | null; // se mantiene para reproducción local (SPEC 04)
   uploadResult: AudioUploadResponse | null;
   errorMessage: string | null;
 }
