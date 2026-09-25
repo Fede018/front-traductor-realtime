@@ -8,7 +8,7 @@ import styles from "./App.module.css";
 
 function App() {
   const [pair, setPair] = useState<LanguagePair>({ source: "es", target: "pt" });
-  const { state, audioUrl, errorMessage, startRecording, stopRecording } = useVoiceRecorder();
+  const { state, audioUrl, errorMessage, startRecording, stopRecording } = useVoiceRecorder(pair);
 
   return (
     <div className={styles.app}>

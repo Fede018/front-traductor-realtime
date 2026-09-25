@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { Volume2 } from "lucide-react";
+import { Loader2, Volume2 } from "lucide-react";
 import type { InteractionState } from "../../hooks/useVoiceRecorder";
 import styles from "./ConversationPanel.module.css";
 
@@ -11,7 +11,7 @@ interface ConversationPanelProps {
 
 export function ConversationPanel({ state, audioUrl, errorMessage }: ConversationPanelProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
-  const showPlayback = state === "ready" && audioUrl !== null;
+  const showPlayback = audioUrl !== null;
 
   const handlePlay = () => {
     audioRef.current?.play();
@@ -29,13 +29,17 @@ export function ConversationPanel({ state, audioUrl, errorMessage }: Conversatio
               Reproducir audio
             </button>
           ) : (
-            <p className={`${styles.text} ${styles.placeholder}`}>
-              {state === "error" && errorMessage ? (
-                <span className={styles.error}>{errorMessage}</span>
-              ) : (
-                "—"
-              )}
+            <p className={`${styles.text} ${styles.placeholder}`}>—</p>
+          )}
+          {state === "sending" && (
+            <p className={`${styles.text} ${styles.status}`}>
+              <Loader2 size={14} className={styles.spinner} />
+              Enviando...
             </p>
+          )}
+          {state === "sent" && <p className={`${styles.text} ${styles.status}`}>Enviado ✓</p>}
+          {state === "error" && errorMessage && (
+            <p className={`${styles.text} ${styles.error}`}>{errorMessage}</p>
           )}
           {audioUrl && <audio ref={audioRef} src={audioUrl} />}
         </div>

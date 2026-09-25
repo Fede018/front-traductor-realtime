@@ -1,6 +1,6 @@
 # SPEC 05 — Enviar audio al backend
 
-> **Status:** Draft
+> **Status:** Implementado
 > **Depends on:** SPEC 02, SPEC 04
 > **Date:** 2026-09-25
 > **Objective:** Definir el contrato REST `POST /api/audio` y conectar el frontend para que, al soltar el botón de micrófono, el audio grabado se suba automáticamente al backend y este confirme la recepción, sin transcribir ni traducir todavía.
@@ -56,11 +56,16 @@ export interface AudioUploadResponse {
 
 ```ts
 // src/hooks/useVoiceRecorder.ts (ampliado)
-export type InteractionState = "idle" | "recording" | "sending" | "sent" | "error";
+export type InteractionState =
+  | "idle"
+  | "recording"
+  | "sending"
+  | "sent"
+  | "error";
 
 export interface VoiceRecorderState {
   state: InteractionState;
-  audioUrl: string | null;              // se mantiene para reproducción local (SPEC 04)
+  audioUrl: string | null; // se mantiene para reproducción local (SPEC 04)
   uploadResult: AudioUploadResponse | null;
   errorMessage: string | null;
 }
@@ -81,14 +86,14 @@ export interface VoiceRecorderState {
 
 ## Acceptance criteria
 
-- [ ] `POST /api/audio` con `audio`, `sourceLanguage`, `targetLanguage` válidos devuelve `201` con `{ id, receivedBytes, contentType, sourceLanguage, targetLanguage }`.
-- [ ] Falta de `audio` o idiomas vacíos devuelve `400` con `ProblemDetail`.
-- [ ] Archivo mayor a 10 MB devuelve `413` con `ProblemDetail`.
-- [ ] Al soltar el botón de micrófono en el frontend, el audio se sube automáticamente sin acción manual adicional.
-- [ ] La UI muestra un estado visible mientras se sube (`sending`) y otro al confirmarse (`sent`).
-- [ ] Si la subida falla (backend caído, red, etc.), la UI muestra el estado de error sin romper el resto de la pantalla, y el audio local sigue siendo reproducible.
-- [ ] `mvn clean verify` (backend) y `npm run build` (frontend) pasan sin errores.
-- [ ] El backend no persiste el audio en disco ni en base de datos — solo lo procesa en memoria durante el request.
+- [x] `POST /api/audio` con `audio`, `sourceLanguage`, `targetLanguage` válidos devuelve `201` con `{ id, receivedBytes, contentType, sourceLanguage, targetLanguage }`.
+- [x] Falta de `audio` o idiomas vacíos devuelve `400` con `ProblemDetail`.
+- [x] Archivo mayor a 10 MB devuelve `413` con `ProblemDetail`.
+- [x] Al soltar el botón de micrófono en el frontend, el audio se sube automáticamente sin acción manual adicional.
+- [x] La UI muestra un estado visible mientras se sube (`sending`) y otro al confirmarse (`sent`).
+- [x] Si la subida falla (backend caído, red, etc.), la UI muestra el estado de error sin romper el resto de la pantalla, y el audio local sigue siendo reproducible.
+- [x] `mvn clean verify` (backend) y `npm run build` (frontend) pasan sin errores.
+- [x] El backend no persiste el audio en disco ni en base de datos — solo lo procesa en memoria durante el request.
 
 ## Decisiones
 
