@@ -1,6 +1,6 @@
 # SPEC 02 — Backend base (Spring Boot)
 
-> **Status:** Draft
+> **Status:** Implementado
 > **Depends on:** SPEC 01
 > **Date:** 2026-09-25
 > **Objective:** Dejar `back-traduct` con dependencias, estructura de paquetes, CORS, endpoint de health y manejo global de errores, sin traducción ni audio todavía.
@@ -38,12 +38,12 @@ Este spec no introduce estructuras de datos de negocio. Solo configuración (`ap
 
 ## Acceptance criteria
 
-- [ ] `mvn clean verify` pasa sin errores.
-- [ ] `GET /actuator/health` devuelve 200 con `{"status":"UP"}`.
-- [ ] Una request `OPTIONS` con `Origin: http://localhost:5173` recibe `Access-Control-Allow-Origin: http://localhost:5173`.
-- [ ] Una excepción no controlada en un controller devuelve `ProblemDetail` (`application/problem+json`), no un stacktrace ni HTML de error por defecto de Spring.
-- [ ] Existen los paquetes `config` y `exception` dentro de `backtraduct.example.traductor`.
-- [ ] No existe ningún endpoint de negocio (audio, texto, traducción) todavía.
+- [x] `mvn clean verify` pasa sin errores.
+- [x] `GET /actuator/health` devuelve 200 con `{"status":"UP"}`.
+- [x] Una request `OPTIONS` con `Origin: http://localhost:5173` recibe `Access-Control-Allow-Origin: http://localhost:5173`.
+- [x] Una excepción no controlada en un controller devuelve `ProblemDetail` (`application/problem+json`), no un stacktrace ni HTML de error por defecto de Spring.
+- [x] Existen los paquetes `config` y `exception` dentro de `backtraduct.example.traductor`.
+- [x] No existe ningún endpoint de negocio (audio, texto, traducción) todavía.
 
 ## Decisiones
 
