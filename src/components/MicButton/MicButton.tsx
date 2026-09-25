@@ -11,7 +11,8 @@ interface MicButtonProps {
 const LABELS: Record<InteractionState, string> = {
   idle: "Mantener para hablar",
   recording: "Grabando...",
-  ready: "Mantené para grabar de nuevo",
+  sending: "Enviando...",
+  sent: "Enviado, mantené para grabar de nuevo",
   error: "Error de micrófono, tocá para reintentar",
 };
 
