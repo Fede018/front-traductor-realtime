@@ -30,3 +30,19 @@
 .placeholder {
   color: #9ca3af;
 }
+
+.playButton {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: none;
+  background: none;
+  padding: 0;
+  color: #111827;
+  font: inherit;
+  cursor: pointer;
+}
+
+.error {
+  color: #b91c1c;
+}
