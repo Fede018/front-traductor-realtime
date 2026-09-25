@@ -1,6 +1,6 @@
 # SPEC 01 — Arquitectura general del traductor por voz
 
-> **Status:** Implementado
+> **Status:** Draft
 > **Depends on:** (ninguno — spec fundacional)
 > **Date:** 2026-09-25
 > **Objective:** Definir la arquitectura de componentes, el flujo de datos extremo a extremo y el roadmap de specs para un traductor de voz en tiempo real (React ↔ Spring Boot ↔ servicio de IA/audio), sin escribir código todavía.
