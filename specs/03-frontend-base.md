@@ -1,6 +1,6 @@
 # SPEC 03 — Frontend base (React + Vite)
 
-> **Status:** Draft
+> **Status:** Aprobado
 > **Depends on:** SPEC 01
 > **Date:** 2026-09-25
 > **Objective:** Scaffoldear `front-traduct` con Vite + React + TypeScript y armar la pantalla principal centrada en voz (mockup conceptual, con estados mockeados), sin integrar IA ni backend todavía.
@@ -58,8 +58,8 @@ export interface LanguagePair {
 export type InteractionState = "idle" | "recording" | "processing" | "result";
 
 export interface MockResult {
-  transcript: string;   // ejemplo: "Hola, ¿cómo estás?"
-  translation: string;  // ejemplo: "Olá, como você está?"
+  transcript: string; // ejemplo: "Hola, ¿cómo estás?"
+  translation: string; // ejemplo: "Olá, como você está?"
 }
 ```
 
