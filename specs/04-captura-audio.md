@@ -1,6 +1,6 @@
 # SPEC 04 — Captura de audio real en el navegador
 
-> **Status:** Aprobado
+> **Status:** Implementado
 > **Depends on:** SPEC 03
 > **Date:** 2026-09-25
 > **Objective:** Reemplazar el hook mock del SPEC 03 por captura real de audio del micrófono (MediaRecorder) con reproducción local, sin enviar nada al backend todavía.
@@ -49,13 +49,13 @@ El audio vive solo en memoria del navegador (`Blob` + Object URL). No se persist
 
 ## Acceptance criteria
 
-- [ ] Al mantener presionado el botón mic por primera vez, el navegador pide permiso de micrófono.
-- [ ] Al soltar el botón, el audio grabado se puede reproducir con "Reproducir audio" y suena igual a lo que se dijo.
-- [ ] Si se deniegan los permisos (o `getUserMedia` no existe), la UI muestra un mensaje de error sin romper el resto de la pantalla, y permite reintentar.
-- [ ] `useMockVoiceInteraction` y cualquier texto de ejemplo hardcodeado fueron eliminados del código.
-- [ ] No hay ninguna request HTTP disparada — el audio queda solo en memoria del navegador.
-- [ ] Al soltar el micrófono, los tracks del stream se detienen (no queda el ícono de "usando micrófono" activo en el navegador).
-- [ ] `npm run build` compila sin errores de TypeScript.
+- [x] Al mantener presionado el botón mic por primera vez, el navegador pide permiso de micrófono.
+- [x] Al soltar el botón, el audio grabado se puede reproducir con "Reproducir audio" y suena igual a lo que se dijo.
+- [x] Si se deniegan los permisos (o `getUserMedia` no existe), la UI muestra un mensaje de error sin romper el resto de la pantalla, y permite reintentar.
+- [x] `useMockVoiceInteraction` y cualquier texto de ejemplo hardcodeado fueron eliminados del código.
+- [x] No hay ninguna request HTTP disparada — el audio queda solo en memoria del navegador.
+- [x] Al soltar el micrófono, los tracks del stream se detienen (no queda el ícono de "usando micrófono" activo en el navegador).
+- [x] `npm run build` compila sin errores de TypeScript.
 
 ## Decisiones
 
