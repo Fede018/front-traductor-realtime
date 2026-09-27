@@ -3,6 +3,7 @@ import { ConversationPanel } from "./components/ConversationPanel/ConversationPa
 import { ConversationHistory } from "./components/ConversationHistory/ConversationHistory";
 import { LanguageSelector } from "./components/LanguageSelector/LanguageSelector";
 import { MicButton } from "./components/MicButton/MicButton";
+import { RealtimeModeToggle } from "./components/RealtimeModeToggle/RealtimeModeToggle";
 import { useConversationHistory } from "./hooks/useConversationHistory";
 import { useVoiceRecorder } from "./hooks/useVoiceRecorder";
 import { useRealtimeMode } from "./hooks/useRealtimeMode";
@@ -39,6 +40,14 @@ function App() {
       <h1 className={styles.title}>Traductor</h1>
       <LanguageSelector pair={pair} onChange={setPair} />
       <MicButton state={state} onStart={startRecording} onStop={stopRecording} />
+      <RealtimeModeToggle
+        status={realtimeMode.status}
+        errorMessage={realtimeMode.errorMessage}
+        liveUserTranscript={realtimeMode.liveUserTranscript}
+        liveTranslation={realtimeMode.liveTranslation}
+        onEnable={realtimeMode.enable}
+        onDisable={realtimeMode.disable}
+      />
       <ConversationPanel
         state={state}
         audioUrl={audioUrl}
