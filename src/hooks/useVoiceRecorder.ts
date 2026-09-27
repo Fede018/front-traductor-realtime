@@ -1,6 +1,6 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { AudioUploadResponse } from "../api/audioClient";
-import { connect, sendChunk, sendStart, sendStop } from "../api/audioSocket";
+import { connect, onClose, onError, onResult, sendChunk, sendStart, sendStop } from "../api/audioSocket";
 import type { LanguagePair } from "../types/language";
 
 export type InteractionState =
@@ -36,6 +36,29 @@ export function useVoiceRecorder(
   const chunksRef = useRef<Blob[]>([]);
   const languagePairRef = useRef(languagePair);
   languagePairRef.current = languagePair;
+  const turnInFlightRef = useRef(false);
+
+  useEffect(() => {
+    onResult((result) => {
+      turnInFlightRef.current = false;
+      setUploadResult(result);
+      setState("sent");
+    });
+
+    onError((detail) => {
+      turnInFlightRef.current = false;
+      setErrorMessage(detail);
+      setState("error");
+    });
+
+    onClose(() => {
+      if (turnInFlightRef.current) {
+        turnInFlightRef.current = false;
+        setErrorMessage("Se cortó la conexión con el servidor. Volvé a intentar grabando de nuevo.");
+        setState("error");
+      }
+    });
+  }, []);
 
   const startRecording = useCallback(() => {
     if (
@@ -84,6 +107,7 @@ export function useVoiceRecorder(
 
           mediaRecorderRef.current = mediaRecorder;
           mediaRecorder.start(TIMESLICE_MS);
+          turnInFlightRef.current = true;
           setState("recording");
         })
       )
