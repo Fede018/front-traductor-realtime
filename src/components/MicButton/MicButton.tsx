@@ -1,51 +1,45 @@
-import { Mic } from "lucide-react";
-import type { InteractionState } from "../../hooks/useVoiceRecorder";
+import { Mic, Square, Loader2 } from "lucide-react";
 import styles from "./MicButton.module.css";
 
+export type MicVisualState = "idle" | "recording" | "processing" | "ready" | "error";
+
 interface MicButtonProps {
-  state: InteractionState;
-  onStart: () => void;
-  onStop: () => void;
+  state: MicVisualState;
+  onPress: () => void;
+  labels?: Partial<Record<MicVisualState, string>>;
 }
 
-const LABELS: Record<InteractionState, string> = {
-  idle: "Mantener para hablar",
-  recording: "Grabando...",
-  sending: "Enviando...",
-  sent: "Enviado, mantené para grabar de nuevo",
-  error: "Error de micrófono, tocá para reintentar",
+const DEFAULT_LABELS: Record<MicVisualState, string> = {
+  idle: "Tocá para hablar",
+  recording: "Escuchando... tocá para terminar",
+  processing: "Procesando...",
+  ready: "Traducción lista",
+  error: "Tocá para reintentar",
 };
 
-export function MicButton({ state, onStart, onStop }: MicButtonProps) {
-  const buttonClassName = [
-    styles.button,
-    state === "recording" ? styles.recording : "",
-    state === "error" ? styles.processing : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
-
-  const handleClick = () => {
-    if (state === "error") {
-      onStart();
-    }
-  };
+export function MicButton({ state, onPress, labels }: MicButtonProps) {
+  const label = { ...DEFAULT_LABELS, ...labels }[state];
+  const disabled = state === "processing";
 
   return (
     <div className={styles.wrapper}>
       <button
         type="button"
-        className={buttonClassName}
-        onMouseDown={onStart}
-        onTouchStart={onStart}
-        onMouseUp={onStop}
-        onTouchEnd={onStop}
-        onClick={handleClick}
-        aria-label="Mantener para hablar"
+        className={`${styles.button} ${styles[state]}`}
+        onClick={onPress}
+        disabled={disabled}
+        aria-label={label}
       >
-        <Mic size={32} />
+        {state === "recording" && <span className={styles.ring} aria-hidden="true" />}
+        {state === "processing" ? (
+          <Loader2 size={30} className={styles.spin} />
+        ) : state === "recording" ? (
+          <Square size={26} fill="currentColor" />
+        ) : (
+          <Mic size={32} />
+        )}
       </button>
-      <span className={styles.label}>{LABELS[state]}</span>
+      <span className={styles.label}>{label}</span>
     </div>
   );
 }

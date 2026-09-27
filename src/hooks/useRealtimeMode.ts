@@ -4,6 +4,7 @@ import type { ConversationTurn } from "../types/conversation";
 import type { LanguagePair } from "../types/language";
 
 export type RealtimeModeStatus = "idle" | "connecting" | "active" | "error";
+export type RealtimePhase = "listening" | "speaking" | "processing";
 
 interface RealtimeEvent {
   type: string;
@@ -13,12 +14,15 @@ interface RealtimeEvent {
 
 const REALTIME_CALLS_URL = "https://api.openai.com/v1/realtime/calls";
 
-export function useRealtimeMode(languagePair: LanguagePair) {
+export function useRealtimeMode(languagePair: LanguagePair, speakerId: string) {
   const [status, setStatus] = useState<RealtimeModeStatus>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [phase, setPhase] = useState<RealtimePhase>("listening");
   const [liveUserTranscript, setLiveUserTranscript] = useState("");
   const [liveTranslation, setLiveTranslation] = useState("");
   const [completedTurn, setCompletedTurn] = useState<ConversationTurn | null>(null);
+  const speakerIdRef = useRef(speakerId);
+  speakerIdRef.current = speakerId;
 
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
   const dataChannelRef = useRef<RTCDataChannel | null>(null);
@@ -43,10 +47,17 @@ export function useRealtimeMode(languagePair: LanguagePair) {
     translationRef.current = "";
     setLiveUserTranscript("");
     setLiveTranslation("");
+    setPhase("listening");
   }, []);
 
   const handleServerEvent = useCallback((event: RealtimeEvent) => {
     switch (event.type) {
+      case "input_audio_buffer.speech_started":
+        setPhase("speaking");
+        break;
+      case "input_audio_buffer.speech_stopped":
+        setPhase("processing");
+        break;
       case "conversation.item.input_audio_transcription.delta":
         userTranscriptRef.current += event.delta ?? "";
         setLiveUserTranscript(userTranscriptRef.current);
@@ -54,6 +65,9 @@ export function useRealtimeMode(languagePair: LanguagePair) {
       case "conversation.item.input_audio_transcription.completed":
         userTranscriptRef.current = event.transcript ?? "";
         setLiveUserTranscript(userTranscriptRef.current);
+        break;
+      case "response.created":
+        setPhase("processing");
         break;
       case "response.output_audio_transcript.delta":
         translationRef.current += event.delta ?? "";
@@ -67,16 +81,19 @@ export function useRealtimeMode(languagePair: LanguagePair) {
         const { source, target } = languagePairRef.current;
         setCompletedTurn({
           id: crypto.randomUUID(),
+          speakerId: speakerIdRef.current,
           sourceLanguage: source,
           targetLanguage: target,
           transcript: userTranscriptRef.current,
           translation: translationRef.current,
           timestamp: new Date().toISOString(),
+          mode: "realtime",
         });
         userTranscriptRef.current = "";
         translationRef.current = "";
         setLiveUserTranscript("");
         setLiveTranslation("");
+        setPhase("listening");
         break;
       }
       default:
@@ -151,5 +168,5 @@ export function useRealtimeMode(languagePair: LanguagePair) {
 
   useEffect(() => cleanup, [cleanup]);
 
-  return { status, errorMessage, liveUserTranscript, liveTranslation, completedTurn, enable, disable };
+  return { status, errorMessage, phase, liveUserTranscript, liveTranslation, completedTurn, enable, disable };
 }

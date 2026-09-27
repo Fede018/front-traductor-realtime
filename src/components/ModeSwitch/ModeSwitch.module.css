@@ -1,0 +1,26 @@
+.switch {
+  display: inline-flex;
+  padding: 3px;
+  background: var(--surface-sunken);
+  border-radius: var(--radius-pill);
+  gap: 2px;
+}
+
+.option {
+  padding: 7px 16px;
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  min-height: 32px;
+}
+
+.option:disabled {
+  opacity: 0.5;
+}
+
+.active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-1);
+}

@@ -1,0 +1,30 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  font-size: 15px;
+  font-weight: 600;
+  min-height: 52px;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.selected {
+  border-color: var(--accent-a);
+  background: var(--accent-a-soft);
+  color: var(--accent-a);
+}
+
+.flag {
+  font-size: 20px;
+  line-height: 1;
+}

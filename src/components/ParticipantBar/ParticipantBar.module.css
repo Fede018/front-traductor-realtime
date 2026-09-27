@@ -1,0 +1,55 @@
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.side {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.reverse {
+  flex-direction: row-reverse;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.infoReverse {
+  align-items: flex-end;
+}
+
+.name {
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 96px;
+}
+
+.lang {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.divider {
+  color: var(--text-faint);
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+@media (min-width: 900px) {
+  .name {
+    max-width: 160px;
+    font-size: 14px;
+  }
+}

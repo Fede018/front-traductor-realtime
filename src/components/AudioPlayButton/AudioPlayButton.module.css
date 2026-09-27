@@ -1,0 +1,47 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px 7px 7px;
+  border-radius: var(--radius-pill);
+  background: var(--accent-soft, var(--surface-sunken));
+  color: var(--accent, var(--text));
+  font-size: 13px;
+  font-weight: 600;
+  align-self: flex-start;
+}
+
+.iconWrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.progressRing {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-90deg);
+}
+
+.track {
+  fill: none;
+  stroke: var(--accent-line, var(--border));
+  stroke-width: 2;
+}
+
+.fill {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-dasharray: 62.8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.1s linear;
+}
+
+.label {
+  white-space: nowrap;
+}

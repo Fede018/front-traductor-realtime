@@ -1,3 +1,4 @@
+import { apiUrl } from "./config";
 import type { LanguageCode } from "../types/language";
 
 export interface AudioUploadResponse {
@@ -26,7 +27,7 @@ export async function uploadAudio(
   formData.append("sourceLanguage", sourceLanguage);
   formData.append("targetLanguage", targetLanguage);
 
-  const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/audio`, {
+  const response = await fetch(apiUrl("/api/audio"), {
     method: "POST",
     body: formData,
   });

@@ -1,3 +1,4 @@
+import { wsUrl } from "./config";
 import type { LanguageCode } from "../types/language";
 import type { AudioUploadResponse } from "./audioClient";
 
@@ -9,8 +10,7 @@ type ResultCallback = (result: AudioUploadResponse) => void;
 type ErrorCallback = (detail: string) => void;
 
 function getSocketUrl(): string {
-  const base = import.meta.env.VITE_API_BASE_URL as string;
-  return base.replace(/^http/, "ws") + "/ws/audio";
+  return wsUrl("/ws/audio");
 }
 
 type CloseCallback = () => void;

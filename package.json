@@ -12,6 +12,7 @@
   "dependencies": {
     "fix-webm-duration": "^1.0.6",
     "lucide-react": "^1.48.0",
+    "qrcode.react": "^4.2.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },
@@ -19,6 +20,7 @@
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
+    "@vitejs/plugin-basic-ssl": "^2.3.0",
     "@vitejs/plugin-react": "^6.1.1",
     "oxlint": "^1.81.0",
     "typescript": "~6.0.2",

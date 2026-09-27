@@ -1,0 +1,95 @@
+.avatar {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: var(--radius-pill);
+  background: var(--accent-soft, var(--surface-sunken));
+  color: var(--accent, var(--text-muted));
+  overflow: visible;
+  font-weight: 700;
+}
+
+.sm {
+  width: 32px;
+  height: 32px;
+  font-size: 13px;
+}
+
+.md {
+  width: 44px;
+  height: 44px;
+  font-size: 16px;
+}
+
+.lg {
+  width: 64px;
+  height: 64px;
+  font-size: 22px;
+}
+
+.xl {
+  width: 96px;
+  height: 96px;
+  font-size: 32px;
+}
+
+.ring {
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 3.5px var(--accent-line, var(--border-strong));
+}
+
+.photo {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-pill);
+  object-fit: cover;
+}
+
+.initial {
+  line-height: 1;
+}
+
+.icon {
+  opacity: 0.7;
+}
+
+.pulse {
+  position: absolute;
+  inset: -4px;
+  border-radius: var(--radius-pill);
+  border: 2px solid var(--accent, var(--accent-a));
+  animation: avatarPulse 1.6s ease-out infinite;
+}
+
+@keyframes avatarPulse {
+  0% {
+    opacity: 0.8;
+    transform: scale(0.94);
+  }
+  70% {
+    opacity: 0;
+    transform: scale(1.18);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.18);
+  }
+}
+
+/* Variantes de avatar genérico: tonos suaves distintos cuando no hay nombre para inicial. */
+.avatar[data-variant="1"] {
+  filter: hue-rotate(35deg);
+}
+.avatar[data-variant="2"] {
+  filter: hue-rotate(-35deg);
+}
+.avatar[data-variant="3"] {
+  filter: hue-rotate(70deg);
+}
+.avatar[data-variant="4"] {
+  filter: hue-rotate(-70deg);
+}
+.avatar[data-variant="5"] {
+  filter: hue-rotate(110deg);
+}

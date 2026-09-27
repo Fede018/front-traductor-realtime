@@ -1,0 +1,125 @@
+.screen {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--safe-top);
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.iconButton,
+.historyButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-pill);
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.iconButton:hover,
+.historyButton:hover {
+  background: var(--surface-sunken);
+  color: var(--text);
+}
+
+.statusBar {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
+}
+
+.main {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px 16px 16px;
+}
+
+.feed {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.viewHistoryLink {
+  align-self: center;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-faint);
+  padding: 6px 12px;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 60px 20px;
+  color: var(--text-faint);
+  text-align: center;
+}
+
+.emptyState p {
+  margin: 0;
+  font-size: 14.5px;
+  max-width: 260px;
+}
+
+.waiting {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 48px 20px;
+}
+
+.waitingTitle {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.dock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px calc(var(--safe-bottom) + 18px);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+
+.dockHint {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--text-faint);
+}
+
+@media (min-width: 900px) {
+  .header {
+    padding: 14px 24px;
+  }
+
+  .main {
+    padding: 16px 24px 24px;
+  }
+
+  .dock {
+    padding: 18px 24px calc(var(--safe-bottom) + 22px);
+  }
+}
