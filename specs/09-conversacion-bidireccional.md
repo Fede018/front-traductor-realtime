@@ -1,6 +1,6 @@
 # SPEC 09 — Conversación bidireccional con historial
 
-> **Status:** Aprobado
+> **Status:** Implementado
 > **Depends on:** SPEC 03, SPEC 08
 > **Date:** 2026-09-25
 > **Objective:** Acumular cada turno completado (audio→transcript→traducción) en un historial visible tipo chat, persistido en `localStorage`, usando el swap manual existente para alternar la dirección de la conversación.
@@ -59,13 +59,13 @@ interface ConversationHistoryState {
 
 ## Acceptance criteria
 
-- [ ] Cada turno completado se agrega al final de la lista visible del historial.
-- [ ] El historial persiste en `localStorage["conversation-history:v1"]` y sobrevive a un reload de la página.
-- [ ] Si el valor guardado en `localStorage` está corrupto o `localStorage` no está disponible, la app arranca igual con historial vacío, sin romperse.
-- [ ] Invertir el par de idiomas (swap) antes de grabar agrega un turno con la dirección de idioma correcta (inversa a la anterior).
-- [ ] La lista hace scroll automático hacia el turno más nuevo al agregarse.
-- [ ] Los turnos del historial muestran solo texto (`transcript`/`translation`) — no hay botón de reproducción de audio en turnos pasados.
-- [ ] `npm run build` compila sin errores de TypeScript.
+- [x] Cada turno completado se agrega al final de la lista visible del historial.
+- [x] El historial persiste en `localStorage["conversation-history:v1"]` y sobrevive a un reload de la página.
+- [x] Si el valor guardado en `localStorage` está corrupto o `localStorage` no está disponible, la app arranca igual con historial vacío, sin romperse.
+- [x] Invertir el par de idiomas (swap) antes de grabar agrega un turno con la dirección de idioma correcta (inversa a la anterior).
+- [x] La lista hace scroll automático hacia el turno más nuevo al agregarse.
+- [x] Los turnos del historial muestran solo texto (`transcript`/`translation`) — no hay botón de reproducción de audio en turnos pasados.
+- [x] `npm run build` compila sin errores de TypeScript.
 
 ## Decisiones
 
