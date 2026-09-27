@@ -1,6 +1,6 @@
 # SPEC 09 — Conversación bidireccional con historial
 
-> **Status:** Draft
+> **Status:** Aprobado
 > **Depends on:** SPEC 03, SPEC 08
 > **Date:** 2026-09-25
 > **Objective:** Acumular cada turno completado (audio→transcript→traducción) en un historial visible tipo chat, persistido en `localStorage`, usando el swap manual existente para alternar la dirección de la conversación.
@@ -30,12 +30,12 @@
 ```ts
 // src/types/conversation.ts
 export interface ConversationTurn {
-  id: string;              // mismo id que devuelve el backend en AudioUploadResponse
+  id: string; // mismo id que devuelve el backend en AudioUploadResponse
   sourceLanguage: LanguageCode;
   targetLanguage: LanguageCode;
   transcript: string;
   translation: string;
-  timestamp: string;       // ISO 8601, new Date().toISOString()
+  timestamp: string; // ISO 8601, new Date().toISOString()
 }
 ```
 
@@ -78,11 +78,11 @@ interface ConversationHistoryState {
 
 ## Risks
 
-| Risk | Mitigation |
-|------|------------|
+| Risk                                                                                | Mitigation                                                                                                                      |
+| ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | `localStorage` tiene un límite práctico (~5-10MB por origen) y no hay cap de turnos | Riesgo bajo en uso normal de una conversación; si se vuelve un problema real, se agrega un límite o rotación en un spec futuro. |
-| El formato del historial cambia en el futuro | La clave versionada (`:v1`) permite detectar el cambio y decidir migrar o descartar sin corromper la app. |
-| `localStorage` deshabilitado o bloqueado (modo privado, políticas del navegador) | Guardado best-effort con `try/catch`; la app sigue funcionando solo con el estado en memoria de la sesión actual. |
+| El formato del historial cambia en el futuro                                        | La clave versionada (`:v1`) permite detectar el cambio y decidir migrar o descartar sin corromper la app.                       |
+| `localStorage` deshabilitado o bloqueado (modo privado, políticas del navegador)    | Guardado best-effort con `try/catch`; la app sigue funcionando solo con el estado en memoria de la sesión actual.               |
 
 ## What is **not** in this spec
 
