@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState } from "react";
-import { uploadAudio, type AudioUploadResponse } from "../api/audioClient";
+import type { AudioUploadResponse } from "../api/audioClient";
+import { connect, sendChunk, sendStart, sendStop } from "../api/audioSocket";
 import type { LanguagePair } from "../types/language";
 
 export type InteractionState =
@@ -17,6 +18,7 @@ export interface VoiceRecorderState {
 }
 
 const PREFERRED_MIME_TYPE = "audio/webm;codecs=opus";
+const TIMESLICE_MS = 250;
 
 export function useVoiceRecorder(
   languagePair: LanguagePair
@@ -46,54 +48,47 @@ export function useVoiceRecorder(
       return;
     }
 
-    navigator.mediaDevices
-      .getUserMedia({ audio: true })
-      .then((stream) => {
-        streamRef.current = stream;
-        chunksRef.current = [];
-
-        const mimeType = MediaRecorder.isTypeSupported(PREFERRED_MIME_TYPE)
-          ? PREFERRED_MIME_TYPE
-          : undefined;
-
-        const mediaRecorder = mimeType
-          ? new MediaRecorder(stream, { mimeType })
-          : new MediaRecorder(stream);
-
-        mediaRecorder.ondataavailable = (event) => {
-          if (event.data.size > 0) {
-            chunksRef.current.push(event.data);
-          }
-        };
-
-        mediaRecorder.onstop = () => {
-          const blob = new Blob(chunksRef.current, {
-            type: mediaRecorder.mimeType || PREFERRED_MIME_TYPE,
-          });
-          setAudioUrl(URL.createObjectURL(blob));
-          setUploadResult(null);
-          setState("sending");
-
+    connect()
+      .then(() =>
+        navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
           const { source, target } = languagePairRef.current;
-          uploadAudio(blob, source, target)
-            .then((result) => {
-              setUploadResult(result);
-              setState("sent");
-            })
-            .catch((error: unknown) => {
-              setErrorMessage(
-                error instanceof Error ? error.message : "No se pudo subir el audio."
-              );
-              setState("error");
-            });
-        };
+          sendStart(source, target);
 
-        mediaRecorderRef.current = mediaRecorder;
-        mediaRecorder.start();
-        setState("recording");
-      })
+          streamRef.current = stream;
+          chunksRef.current = [];
+
+          const mimeType = MediaRecorder.isTypeSupported(PREFERRED_MIME_TYPE)
+            ? PREFERRED_MIME_TYPE
+            : undefined;
+
+          const mediaRecorder = mimeType
+            ? new MediaRecorder(stream, { mimeType })
+            : new MediaRecorder(stream);
+
+          mediaRecorder.ondataavailable = (event) => {
+            if (event.data.size > 0) {
+              chunksRef.current.push(event.data);
+              event.data.arrayBuffer().then((buffer) => sendChunk(buffer));
+            }
+          };
+
+          mediaRecorder.onstop = () => {
+            const blob = new Blob(chunksRef.current, {
+              type: mediaRecorder.mimeType || PREFERRED_MIME_TYPE,
+            });
+            setAudioUrl(URL.createObjectURL(blob));
+            setUploadResult(null);
+            setState("sending");
+            sendStop();
+          };
+
+          mediaRecorderRef.current = mediaRecorder;
+          mediaRecorder.start(TIMESLICE_MS);
+          setState("recording");
+        })
+      )
       .catch(() => {
-        setErrorMessage("No se pudo acceder al micrófono. Revisá los permisos.");
+        setErrorMessage("No se pudo acceder al micrófono o al servidor de streaming.");
         setState("error");
       });
   }, []);
