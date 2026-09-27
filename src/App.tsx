@@ -8,14 +8,19 @@ import styles from "./App.module.css";
 
 function App() {
   const [pair, setPair] = useState<LanguagePair>({ source: "es", target: "pt" });
-  const { state, audioUrl, errorMessage, startRecording, stopRecording } = useVoiceRecorder(pair);
+  const { state, audioUrl, uploadResult, errorMessage, startRecording, stopRecording } = useVoiceRecorder(pair);
 
   return (
     <div className={styles.app}>
       <h1 className={styles.title}>Traductor</h1>
       <LanguageSelector pair={pair} onChange={setPair} />
       <MicButton state={state} onStart={startRecording} onStop={stopRecording} />
-      <ConversationPanel state={state} audioUrl={audioUrl} errorMessage={errorMessage} />
+      <ConversationPanel
+        state={state}
+        audioUrl={audioUrl}
+        transcript={uploadResult?.transcript ?? null}
+        errorMessage={errorMessage}
+      />
     </div>
   );
 }
