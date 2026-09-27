@@ -1,6 +1,6 @@
 # SPEC 06 — Speech-to-Text (OpenAI Whisper)
 
-> **Status:** Draft
+> **Status:** Aprobado
 > **Depends on:** SPEC 05
 > **Date:** 2026-09-25
 > **Objective:** Transcribir el audio recibido en `POST /api/audio` usando la API de OpenAI (`whisper-1`) y devolver el texto real en la misma respuesta, sin traducir todavía.
@@ -94,12 +94,12 @@ export interface AudioUploadResponse {
 
 ## Risks
 
-| Risk | Mitigation |
-|------|------------|
-| `OPENAI_API_KEY` expuesta por error (commit, log) | Solo se lee de variable de entorno; nunca se loguea el valor completo; `.gitignore` ya cubre `.env` en el frontend, y la key del backend no vive en ningún archivo del repo. |
-| Costo por uso de la API (facturación por minuto de audio) | Sin límite automático en este spec — a monitorear manualmente durante desarrollo; un límite de uso se evalúa si hace falta más adelante. |
-| Latencia variable de OpenAI (audio largo, red lenta) | Aceptado en esta etapa (no hay SLA de tiempo real todavía); se revisa en SPEC 10. |
-| Dependencia de internet — sin conexión, no hay transcripción | Aceptado: es la contrapartida elegida al descartar whisper.cpp local. |
+| Risk                                                         | Mitigation                                                                                                                                                                   |
+| ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `OPENAI_API_KEY` expuesta por error (commit, log)            | Solo se lee de variable de entorno; nunca se loguea el valor completo; `.gitignore` ya cubre `.env` en el frontend, y la key del backend no vive en ningún archivo del repo. |
+| Costo por uso de la API (facturación por minuto de audio)    | Sin límite automático en este spec — a monitorear manualmente durante desarrollo; un límite de uso se evalúa si hace falta más adelante.                                     |
+| Latencia variable de OpenAI (audio largo, red lenta)         | Aceptado en esta etapa (no hay SLA de tiempo real todavía); se revisa en SPEC 10.                                                                                            |
+| Dependencia de internet — sin conexión, no hay transcripción | Aceptado: es la contrapartida elegida al descartar whisper.cpp local.                                                                                                        |
 
 ## What is **not** in this spec
 
