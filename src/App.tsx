@@ -19,6 +19,7 @@ function App() {
         state={state}
         audioUrl={audioUrl}
         transcript={uploadResult?.transcript ?? null}
+        translation={uploadResult?.translation ?? null}
         errorMessage={errorMessage}
       />
     </div>

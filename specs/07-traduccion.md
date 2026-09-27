@@ -1,6 +1,6 @@
 # SPEC 07 — Traducción de texto (OpenAI)
 
-> **Status:** Draft
+> **Status:** Aprobado
 > **Depends on:** SPEC 06
 > **Date:** 2026-09-25
 > **Objective:** Traducir el `transcript` obtenido en SPEC 06 del idioma origen al idioma destino usando OpenAI (`gpt-4o-mini`), devolviendo el resultado en la misma respuesta de `POST /api/audio`, sin generar audio todavía.
@@ -67,7 +67,7 @@ export interface AudioUploadResponse {
 
 1. **Config.** En `application.properties`, agregar `openai.translation.model=gpt-4o-mini`.
 2. **Excepción de dominio.** Crear `src/main/java/backtraduct/example/traductor/exception/TranslationException.java` (como arriba).
-3. **Cliente de traducción.** Crear `src/main/java/backtraduct/example/traductor/client/OpenAiTranslationClient.java`. Método `translate(String text, String sourceLanguage, String targetLanguage): String`. Arma un chat completion con system prompt fijo tipo: *"Traducí literalmente el siguiente texto de {sourceLanguage} a {targetLanguage}. Devolvé únicamente la traducción, sin comillas, sin explicaciones, sin agregar nada que no esté en el texto original."* + el `transcript` como mensaje de usuario. Parsea `choices[0].message.content`. Cualquier fallo (status no-2xx, timeout, respuesta vacía) se relanza como `TranslationException`.
+3. **Cliente de traducción.** Crear `src/main/java/backtraduct/example/traductor/client/OpenAiTranslationClient.java`. Método `translate(String text, String sourceLanguage, String targetLanguage): String`. Arma un chat completion con system prompt fijo tipo: _"Traducí literalmente el siguiente texto de {sourceLanguage} a {targetLanguage}. Devolvé únicamente la traducción, sin comillas, sin explicaciones, sin agregar nada que no esté en el texto original."_ + el `transcript` como mensaje de usuario. Parsea `choices[0].message.content`. Cualquier fallo (status no-2xx, timeout, respuesta vacía) se relanza como `TranslationException`.
 4. **Ampliar el DTO.** Agregar el campo `translation` a `AudioUploadResponse`.
 5. **Validar transcript no vacío.** En `AudioService`, antes de traducir, si `transcript.isBlank()` lanzar `TranslationException("No se detectó voz en el audio")` sin llamar a OpenAI.
 6. **Conectar en `AudioService`.** Después de obtener `transcript` (SPEC 06), llamar `OpenAiTranslationClient.translate(transcript, sourceLanguage, targetLanguage)` y armar el `AudioUploadResponse` con `translation` real. Verificación: `curl -F "audio=@sample_es.webm" -F sourceLanguage=es -F targetLanguage=pt http://localhost:8080/api/audio`, el campo `translation` es una traducción correcta al portugués del `transcript`.
@@ -96,11 +96,11 @@ export interface AudioUploadResponse {
 
 ## Risks
 
-| Risk | Mitigation |
-|------|------------|
+| Risk                                                                                                       | Mitigation                                                                                                                                                                             |
+| ---------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Prompt injection: el texto transcripto podría contener instrucciones que confundan al modelo de traducción | System prompt rígido que solo traduce literalmente, sin ejecutar instrucciones contenidas en el texto del usuario. Riesgo menor dado el caso de uso (traductor de voz conversacional). |
-| Costo duplicado: cada request ahora dispara 2 llamadas a OpenAI (STT + traducción) | Aceptado en esta etapa; a monitorear igual que el costo de STT (SPEC 06). |
-| Calidad de traducción variable en frases ambiguas o cortas | Aceptado como limitación conocida de esta etapa; no hay validación de calidad automatizada. |
+| Costo duplicado: cada request ahora dispara 2 llamadas a OpenAI (STT + traducción)                         | Aceptado en esta etapa; a monitorear igual que el costo de STT (SPEC 06).                                                                                                              |
+| Calidad de traducción variable en frases ambiguas o cortas                                                 | Aceptado como limitación conocida de esta etapa; no hay validación de calidad automatizada.                                                                                            |
 
 ## What is **not** in this spec
 

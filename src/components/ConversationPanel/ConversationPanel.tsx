@@ -7,10 +7,11 @@ interface ConversationPanelProps {
   state: InteractionState;
   audioUrl: string | null;
   transcript: string | null;
+  translation: string | null;
   errorMessage: string | null;
 }
 
-export function ConversationPanel({ state, audioUrl, transcript, errorMessage }: ConversationPanelProps) {
+export function ConversationPanel({ state, audioUrl, transcript, translation, errorMessage }: ConversationPanelProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const showPlayback = audioUrl !== null;
 
@@ -55,7 +56,11 @@ export function ConversationPanel({ state, audioUrl, transcript, errorMessage }:
         <Volume2 size={18} />
         <div>
           <p className={styles.label}>Otra persona</p>
-          <p className={`${styles.text} ${styles.placeholder}`}>—</p>
+          {state === "sent" && translation ? (
+            <p className={styles.text}>{translation}</p>
+          ) : (
+            <p className={`${styles.text} ${styles.placeholder}`}>—</p>
+          )}
         </div>
       </div>
     </div>
