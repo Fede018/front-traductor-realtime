@@ -1,6 +1,6 @@
 # SPEC 07 — Traducción de texto (OpenAI)
 
-> **Status:** Aprobado
+> **Status:** Implementado
 > **Depends on:** SPEC 06
 > **Date:** 2026-09-25
 > **Objective:** Traducir el `transcript` obtenido en SPEC 06 del idioma origen al idioma destino usando OpenAI (`gpt-4o-mini`), devolviendo el resultado en la misma respuesta de `POST /api/audio`, sin generar audio todavía.
@@ -78,12 +78,12 @@ export interface AudioUploadResponse {
 
 ## Acceptance criteria
 
-- [ ] `POST /api/audio` con un audio real devuelve `translation` no vacía y correcta en el idioma destino (verificación manual con audio de prueba).
-- [ ] Si el `transcript` viene vacío, la request falla con `500` `ProblemDetail` en vez de intentar traducir un string vacío.
-- [ ] Si la traducción falla (API caída, key inválida), el endpoint devuelve `500` con `ProblemDetail` claro, sin tumbar el backend ni exponer detalles internos del proveedor.
-- [ ] El frontend muestra la traducción real en el panel de conversación (lado "Otra persona") después de subir el audio.
-- [ ] `mvn clean verify` (backend) y `npm run build` (frontend) pasan sin errores.
-- [ ] No se agrega ninguna reproducción de audio de la traducción todavía (eso es SPEC 08).
+- [x] `POST /api/audio` con un audio real devuelve `translation` no vacía y correcta en el idioma destino (verificación manual con audio de prueba).
+- [x] Si el `transcript` viene vacío, la request falla con `500` `ProblemDetail` en vez de intentar traducir un string vacío.
+- [x] Si la traducción falla (API caída, key inválida), el endpoint devuelve `500` con `ProblemDetail` claro, sin tumbar el backend ni exponer detalles internos del proveedor.
+- [x] El frontend muestra la traducción real en el panel de conversación (lado "Otra persona") después de subir el audio.
+- [x] `mvn clean verify` (backend) y `npm run build` (frontend) pasan sin errores.
+- [x] No se agrega ninguna reproducción de audio de la traducción todavía (eso es SPEC 08).
 
 ## Decisiones
 
