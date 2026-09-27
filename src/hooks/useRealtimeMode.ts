@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createRealtimeSession } from "../api/realtimeClient";
+import type { ConversationTurn } from "../types/conversation";
 import type { LanguagePair } from "../types/language";
 
 export type RealtimeModeStatus = "idle" | "connecting" | "active" | "error";
@@ -17,6 +18,7 @@ export function useRealtimeMode(languagePair: LanguagePair) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [liveUserTranscript, setLiveUserTranscript] = useState("");
   const [liveTranslation, setLiveTranslation] = useState("");
+  const [completedTurn, setCompletedTurn] = useState<ConversationTurn | null>(null);
 
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
   const dataChannelRef = useRef<RTCDataChannel | null>(null);
@@ -24,6 +26,8 @@ export function useRealtimeMode(languagePair: LanguagePair) {
   const audioElementRef = useRef<HTMLAudioElement | null>(null);
   const languagePairRef = useRef(languagePair);
   languagePairRef.current = languagePair;
+  const userTranscriptRef = useRef("");
+  const translationRef = useRef("");
 
   const cleanup = useCallback(() => {
     dataChannelRef.current?.close();
@@ -35,6 +39,8 @@ export function useRealtimeMode(languagePair: LanguagePair) {
     if (audioElementRef.current) {
       audioElementRef.current.srcObject = null;
     }
+    userTranscriptRef.current = "";
+    translationRef.current = "";
     setLiveUserTranscript("");
     setLiveTranslation("");
   }, []);
@@ -42,17 +48,37 @@ export function useRealtimeMode(languagePair: LanguagePair) {
   const handleServerEvent = useCallback((event: RealtimeEvent) => {
     switch (event.type) {
       case "conversation.item.input_audio_transcription.delta":
-        setLiveUserTranscript((prev) => prev + (event.delta ?? ""));
+        userTranscriptRef.current += event.delta ?? "";
+        setLiveUserTranscript(userTranscriptRef.current);
         break;
       case "conversation.item.input_audio_transcription.completed":
-        setLiveUserTranscript(event.transcript ?? "");
+        userTranscriptRef.current = event.transcript ?? "";
+        setLiveUserTranscript(userTranscriptRef.current);
         break;
       case "response.output_audio_transcript.delta":
-        setLiveTranslation((prev) => prev + (event.delta ?? ""));
+        translationRef.current += event.delta ?? "";
+        setLiveTranslation(translationRef.current);
         break;
       case "response.output_audio_transcript.done":
-        setLiveTranslation(event.transcript ?? "");
+        translationRef.current = event.transcript ?? "";
+        setLiveTranslation(translationRef.current);
         break;
+      case "response.done": {
+        const { source, target } = languagePairRef.current;
+        setCompletedTurn({
+          id: crypto.randomUUID(),
+          sourceLanguage: source,
+          targetLanguage: target,
+          transcript: userTranscriptRef.current,
+          translation: translationRef.current,
+          timestamp: new Date().toISOString(),
+        });
+        userTranscriptRef.current = "";
+        translationRef.current = "";
+        setLiveUserTranscript("");
+        setLiveTranslation("");
+        break;
+      }
       default:
         break;
     }
@@ -125,5 +151,5 @@ export function useRealtimeMode(languagePair: LanguagePair) {
 
   useEffect(() => cleanup, [cleanup]);
 
-  return { status, errorMessage, liveUserTranscript, liveTranslation, enable, disable };
+  return { status, errorMessage, liveUserTranscript, liveTranslation, completedTurn, enable, disable };
 }
