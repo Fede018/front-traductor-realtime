@@ -1,6 +1,6 @@
 # SPEC 09 — Conversación bidireccional con historial
 
-> **Status:** Draft
+> **Status:** Implementado
 > **Depends on:** SPEC 03, SPEC 08
 > **Date:** 2026-09-25
 > **Objective:** Acumular cada turno completado (audio→transcript→traducción) en un historial visible tipo chat, persistido en `localStorage`, usando el swap manual existente para alternar la dirección de la conversación.
@@ -30,12 +30,12 @@
 ```ts
 // src/types/conversation.ts
 export interface ConversationTurn {
-  id: string;              // mismo id que devuelve el backend en AudioUploadResponse
+  id: string; // mismo id que devuelve el backend en AudioUploadResponse
   sourceLanguage: LanguageCode;
   targetLanguage: LanguageCode;
   transcript: string;
   translation: string;
-  timestamp: string;       // ISO 8601, new Date().toISOString()
+  timestamp: string; // ISO 8601, new Date().toISOString()
 }
 ```
 
@@ -59,13 +59,13 @@ interface ConversationHistoryState {
 
 ## Acceptance criteria
 
-- [ ] Cada turno completado se agrega al final de la lista visible del historial.
-- [ ] El historial persiste en `localStorage["conversation-history:v1"]` y sobrevive a un reload de la página.
-- [ ] Si el valor guardado en `localStorage` está corrupto o `localStorage` no está disponible, la app arranca igual con historial vacío, sin romperse.
-- [ ] Invertir el par de idiomas (swap) antes de grabar agrega un turno con la dirección de idioma correcta (inversa a la anterior).
-- [ ] La lista hace scroll automático hacia el turno más nuevo al agregarse.
-- [ ] Los turnos del historial muestran solo texto (`transcript`/`translation`) — no hay botón de reproducción de audio en turnos pasados.
-- [ ] `npm run build` compila sin errores de TypeScript.
+- [x] Cada turno completado se agrega al final de la lista visible del historial.
+- [x] El historial persiste en `localStorage["conversation-history:v1"]` y sobrevive a un reload de la página.
+- [x] Si el valor guardado en `localStorage` está corrupto o `localStorage` no está disponible, la app arranca igual con historial vacío, sin romperse.
+- [x] Invertir el par de idiomas (swap) antes de grabar agrega un turno con la dirección de idioma correcta (inversa a la anterior).
+- [x] La lista hace scroll automático hacia el turno más nuevo al agregarse.
+- [x] Los turnos del historial muestran solo texto (`transcript`/`translation`) — no hay botón de reproducción de audio en turnos pasados.
+- [x] `npm run build` compila sin errores de TypeScript.
 
 ## Decisiones
 
@@ -78,11 +78,11 @@ interface ConversationHistoryState {
 
 ## Risks
 
-| Risk | Mitigation |
-|------|------------|
+| Risk                                                                                | Mitigation                                                                                                                      |
+| ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | `localStorage` tiene un límite práctico (~5-10MB por origen) y no hay cap de turnos | Riesgo bajo en uso normal de una conversación; si se vuelve un problema real, se agrega un límite o rotación en un spec futuro. |
-| El formato del historial cambia en el futuro | La clave versionada (`:v1`) permite detectar el cambio y decidir migrar o descartar sin corromper la app. |
-| `localStorage` deshabilitado o bloqueado (modo privado, políticas del navegador) | Guardado best-effort con `try/catch`; la app sigue funcionando solo con el estado en memoria de la sesión actual. |
+| El formato del historial cambia en el futuro                                        | La clave versionada (`:v1`) permite detectar el cambio y decidir migrar o descartar sin corromper la app.                       |
+| `localStorage` deshabilitado o bloqueado (modo privado, políticas del navegador)    | Guardado best-effort con `try/catch`; la app sigue funcionando solo con el estado en memoria de la sesión actual.               |
 
 ## What is **not** in this spec
 
