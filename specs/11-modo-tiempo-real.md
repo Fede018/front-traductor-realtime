@@ -1,6 +1,6 @@
 # SPEC 11 — Modo tiempo real (OpenAI Realtime API)
 
-> **Status:** Draft
+> **Status:** Implementando
 > **Depends on:** SPEC 08, SPEC 09
 > **Date:** 2026-09-25
 > **Objective:** Agregar un modo alternativo "tiempo real" que usa la Realtime API de OpenAI vía WebRTC para traducir hablando mientras la persona todavía está hablando, sin tocar el modo clásico (SPEC 04-10) que sigue siendo el default.
@@ -61,15 +61,15 @@ Los turnos generados en este modo usan el mismo `ConversationTurn` de SPEC 09 (`
 
 ## Implementation plan
 
-1. **Backend: config.** En `application.properties`, agregar `openai.realtime.model=gpt-4o-realtime-preview` y `openai.realtime.voice=alloy` (misma voz que SPEC 08, por consistencia).
+1. **Backend: config.** En `application.properties`, agregar `openai.realtime.model=gpt-realtime` y `openai.realtime.voice=alloy` (misma voz que SPEC 08, por consistencia). _(Nota: el spec original decía `gpt-4o-realtime-preview`; se corrigió a `gpt-realtime`, el modelo vigente en la API real al momento de implementar — ver Decisiones.)_
 2. **Backend: excepción.** Crear `src/main/java/backtraduct/example/traductor/exception/RealtimeSessionException.java`.
 3. **Backend: DTO.** Crear `src/main/java/backtraduct/example/traductor/dto/RealtimeSessionResponse.java` (como arriba).
-4. **Backend: cliente Realtime.** Crear `src/main/java/backtraduct/example/traductor/client/OpenAiRealtimeClient.java`. Método `createEphemeralSession(String sourceLanguage, String targetLanguage): RealtimeSessionResponse`. Llama al endpoint de creación de sesiones Realtime de OpenAI con `{ model, voice, turn_detection: { type: "server_vad" }, instructions: <prompt de intérprete> }`. El prompt es fijo y estricto: *"Sos un intérprete en tiempo real. No conversás, no respondés preguntas, no agregás comentarios propios. Tu única tarea es escuchar lo que se dice en {sourceLanguage} y decir en voz alta, inmediatamente, la traducción literal en {targetLanguage}. Nada más."* Devuelve el `client_secret` efímero recibido. Fallos → `RealtimeSessionException`.
+4. **Backend: cliente Realtime.** Crear `src/main/java/backtraduct/example/traductor/client/OpenAiRealtimeClient.java`. Método `createEphemeralSession(String sourceLanguage, String targetLanguage): RealtimeSessionResponse`. Llama a `POST https://api.openai.com/v1/realtime/client_secrets` con body `{ "session": { "type": "realtime", "model", "audio": { "output": { "voice" }, "input": { "turn_detection": { "type": "server_vad" } } }, "instructions": <prompt de intérprete> } }`. El prompt es fijo y estricto: _"Sos un intérprete en tiempo real. No conversás, no respondés preguntas, no agregás comentarios propios. Tu única tarea es escuchar lo que se dice en {sourceLanguage} y decir en voz alta, inmediatamente, la traducción literal en {targetLanguage}. Nada más."_ La respuesta trae `value` (el client secret efímero) y `expires_at` (epoch seconds) en el nivel raíz, y el objeto `session` con el `model` usado. Fallos → `RealtimeSessionException`. _(Nota: el spec original describía el endpoint viejo `/v1/realtime/sessions` con `{model, voice, turn_detection, instructions}` en el nivel raíz y una respuesta con `client_secret.value` anidado — ese endpoint ya no existe. Se corrigió al endpoint y forma vigentes, verificado con curl directo contra la API real. Ver Decisiones.)_
 5. **Backend: controller.** Crear `src/main/java/backtraduct/example/traductor/controller/RealtimeController.java`. `POST /api/realtime/session`, body `{ sourceLanguage, targetLanguage }`, delega en el cliente, devuelve `RealtimeSessionResponse`.
 6. **Backend: manejo de errores.** Ampliar `GlobalExceptionHandler` con `@ExceptionHandler(RealtimeSessionException.class)` → `500` `ProblemDetail`.
 7. **Backend: verificación.** `curl -X POST -H "Content-Type: application/json" -d '{"sourceLanguage":"es","targetLanguage":"pt"}' http://localhost:8080/api/realtime/session` devuelve un `clientSecret` no vacío.
 8. **Frontend: tipos y cliente HTTP.** Crear `src/types/realtimeSession.ts` y `src/api/realtimeClient.ts` con `createRealtimeSession(sourceLanguage, targetLanguage): Promise<RealtimeSessionResponse>` (fetch al backend, mismo patrón que `audioClient.ts`).
-9. **Frontend: hook `useRealtimeMode`.** Crear `src/hooks/useRealtimeMode.ts`. Al activar: pide el client secret al backend, `getUserMedia({ audio: true })`, crea `RTCPeerConnection`, agrega el track del micrófono, crea un data channel (`oai-events`) para recibir eventos de transcripción, genera el SDP offer y lo postea a la Realtime API de OpenAI con el client secret como Bearer token, aplica el SDP answer recibido (`setRemoteDescription`). El track remoto (`ontrack`) se conecta a un `<audio autoPlay>` oculto. Al desactivar: cierra la conexión, detiene los tracks del micrófono.
+9. **Frontend: hook `useRealtimeMode`.** Crear `src/hooks/useRealtimeMode.ts`. Al activar: pide el client secret al backend, `getUserMedia({ audio: true })`, crea `RTCPeerConnection`, agrega el track del micrófono, crea un data channel (`oai-events`) para recibir eventos de transcripción, genera el SDP offer y lo postea a `https://api.openai.com/v1/realtime/calls?model={model}` con el client secret como Bearer token y `Content-Type: application/sdp`, aplica el SDP answer recibido (`setRemoteDescription`). El track remoto (`ontrack`) se conecta a un `<audio autoPlay>` oculto. Al desactivar: cierra la conexión, detiene los tracks del micrófono. _(Nota: la URL de intercambio SDP también cambió respecto a lo que asumía originalmente el spec; se confirmó `/v1/realtime/calls` contra la documentación oficial vigente al implementar.)_
 10. **Frontend: transcript en vivo.** Escuchar los eventos del data channel (transcripción parcial/final del usuario y de la traducción) y mostrarlos en pantalla mientras el modo está activo, como texto auxiliar.
 11. **Frontend: integración con el historial.** Al completarse un turno (evento de fin de respuesta + transcripción de usuario correspondiente), armar un `ConversationTurn` (`id: crypto.randomUUID()`, par de idiomas activo, `transcript`, `translation`, `timestamp`) y `appendTurn()` al mismo historial de SPEC 09.
 12. **Frontend: componente `RealtimeModeToggle`.** Crear `src/components/RealtimeModeToggle/RealtimeModeToggle.tsx` + `.module.css`. Switch on/off, muestra estado (conectando/activo/error) y el transcript en vivo mientras está activo.
@@ -77,15 +77,15 @@ Los turnos generados en este modo usan el mismo `ConversationTurn` de SPEC 09 (`
 
 ## Acceptance criteria
 
-- [ ] `POST /api/realtime/session` devuelve un `clientSecret` efímero válido; la `OPENAI_API_KEY` real nunca llega al navegador.
-- [ ] Activar el toggle abre una conexión WebRTC directa entre el navegador y OpenAI — el audio no pasa por nuestro backend.
-- [ ] Con el toggle activo, hablar sin mantener ningún botón presionado dispara la traducción hablada automáticamente en cada pausa detectada por VAD.
-- [ ] El modelo traduce literalmente y no responde preguntas ni conversa (verificado manualmente con al menos un caso de prueba).
-- [ ] Cada turno completado en modo tiempo real se agrega al historial (SPEC 09), igual que los turnos del modo clásico.
-- [ ] El modo clásico (SPEC 04-10) sigue funcionando exactamente igual, sin regresión.
-- [ ] Si falla la creación de la sesión efímera (backend caído, key inválida), el toggle no se activa y muestra un error claro.
-- [ ] Desactivar el toggle cierra la conexión WebRTC y libera el micrófono (no queda el ícono de "usando micrófono" activo).
-- [ ] `mvn clean verify` (backend) y `npm run build` (frontend) pasan sin errores.
+- [x] `POST /api/realtime/session` devuelve un `clientSecret` efímero válido; la `OPENAI_API_KEY` real nunca llega al navegador.
+- [x] Activar el toggle abre una conexión WebRTC directa entre el navegador y OpenAI — el audio no pasa por nuestro backend.
+- [x] Con el toggle activo, hablar sin mantener ningún botón presionado dispara la traducción hablada automáticamente en cada pausa detectada por VAD.
+- [x] El modelo traduce literalmente y no responde preguntas ni conversa (verificado manualmente con al menos un caso de prueba).
+- [x] Cada turno completado en modo tiempo real se agrega al historial (SPEC 09), igual que los turnos del modo clásico.
+- [x] El modo clásico (SPEC 04-10) sigue funcionando exactamente igual, sin regresión.
+- [x] Si falla la creación de la sesión efímera (backend caído, key inválida), el toggle no se activa y muestra un error claro.
+- [x] Desactivar el toggle cierra la conexión WebRTC y libera el micrófono (no queda el ícono de "usando micrófono" activo).
+- [x] `mvn clean verify` (backend) y `npm run build` (frontend) pasan sin errores.
 
 ## Decisiones
 
@@ -95,16 +95,17 @@ Los turnos generados en este modo usan el mismo `ConversationTurn` de SPEC 09 (`
 - **Sí:** `server_vad` + toggle on/off en vez de mantener presionado. Motivo: es la experiencia de "intérprete en vivo" que busca este spec; forzar mantener-presionado hubiera apagado el VAD automático sin necesidad real.
 - **Sí:** system prompt estricto ("no conversar, solo traducir"). Motivo: riesgo conocido de que un modelo conversacional responda en vez de traducir — se deja explícito en las instrucciones y se verifica manualmente.
 - **No:** permitir cambiar el par de idiomas en medio de una sesión activa. Motivo: las instrucciones del modelo se fijan al crear la sesión Realtime; cambiar de idioma implica apagar, invertir el selector, y prender de nuevo.
+- **Sí (corrección durante implementación):** usar `POST /v1/realtime/client_secrets` con modelo `gpt-realtime`, en vez de `POST /v1/realtime/sessions` con `gpt-4o-realtime-preview` como decía originalmente este spec. Motivo: al implementar (2026-09-27) se verificó con curl directo que el endpoint viejo devuelve `Invalid URL` — OpenAI lo reemplazó. Se corrigió spec y código al contrato real, confirmado con curl exitoso.
 - **No:** persistir el audio de la sesión en tiempo real. Motivo: consistente con las decisiones de SPEC 05-10 — solo el texto (`transcript`/`translation`) queda en el historial.
 
 ## Risks
 
-| Risk | Mitigation |
-|------|------------|
-| El modelo conversa en vez de traducir literalmente (el prompt no garantiza el comportamiento al 100%) | Verificación manual explícita en los criterios de aceptación; si falla seguido en uso real, se ajusta el prompt o se agregan restricciones en un spec de ajuste. |
+| Risk                                                                                                                    | Mitigation                                                                                                                                                          |
+| ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| El modelo conversa en vez de traducir literalmente (el prompt no garantiza el comportamiento al 100%)                   | Verificación manual explícita en los criterios de aceptación; si falla seguido en uso real, se ajusta el prompt o se agregan restricciones en un spec de ajuste.    |
 | Costo de la Realtime API (factura por minuto de audio de entrada Y salida) más alto que STT+traducción+TTS por separado | Aceptado como modo experimental/opt-in vía toggle — el usuario elige cuándo pagar ese costo extra; el modo clásico sigue siendo el default gratuito en comparación. |
-| Compatibilidad de WebRTC en redes con NAT restrictivo (ej. redes corporativas) | Riesgo bajo para desarrollo local; a revisar si se despliega en un entorno de producción real. |
-| Token efímero interceptado durante su corta ventana de vida | Vida corta y alcance limitado a una sesión Realtime puntual; se transmite solo por HTTPS/WSS. |
+| Compatibilidad de WebRTC en redes con NAT restrictivo (ej. redes corporativas)                                          | Riesgo bajo para desarrollo local; a revisar si se despliega en un entorno de producción real.                                                                      |
+| Token efímero interceptado durante su corta ventana de vida                                                             | Vida corta y alcance limitado a una sesión Realtime puntual; se transmite solo por HTTPS/WSS.                                                                       |
 
 ## What is **not** in this spec
 
