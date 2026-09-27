@@ -58,7 +58,7 @@ export function sendStart(sourceLanguage: LanguageCode, targetLanguage: Language
   socket?.send(JSON.stringify({ type: "start", sourceLanguage, targetLanguage }));
 }
 
-export function sendChunk(chunk: ArrayBuffer) {
+export function sendChunk(chunk: Blob) {
   socket?.send(chunk);
 }
 

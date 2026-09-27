@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import fixWebmDuration from "fix-webm-duration";
 import type { AudioUploadResponse } from "../api/audioClient";
 import { connect, onClose, onError, onResult, sendChunk, sendStart, sendStop } from "../api/audioSocket";
 import type { LanguagePair } from "../types/language";
@@ -34,6 +35,7 @@ export function useVoiceRecorder(
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const recordingStartRef = useRef(0);
   const languagePairRef = useRef(languagePair);
   languagePairRef.current = languagePair;
   const turnInFlightRef = useRef(false);
@@ -91,7 +93,7 @@ export function useVoiceRecorder(
           mediaRecorder.ondataavailable = (event) => {
             if (event.data.size > 0) {
               chunksRef.current.push(event.data);
-              event.data.arrayBuffer().then((buffer) => sendChunk(buffer));
+              sendChunk(event.data);
             }
           };
 
@@ -99,13 +101,17 @@ export function useVoiceRecorder(
             const blob = new Blob(chunksRef.current, {
               type: mediaRecorder.mimeType || PREFERRED_MIME_TYPE,
             });
-            setAudioUrl(URL.createObjectURL(blob));
+            const duration = Date.now() - recordingStartRef.current;
+            fixWebmDuration(blob, duration).then((fixedBlob) => {
+              setAudioUrl(URL.createObjectURL(fixedBlob));
+            });
             setUploadResult(null);
             setState("sending");
             sendStop();
           };
 
           mediaRecorderRef.current = mediaRecorder;
+          recordingStartRef.current = Date.now();
           mediaRecorder.start(TIMESLICE_MS);
           turnInFlightRef.current = true;
           setState("recording");
