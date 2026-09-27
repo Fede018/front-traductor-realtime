@@ -6,10 +6,11 @@ import styles from "./ConversationPanel.module.css";
 interface ConversationPanelProps {
   state: InteractionState;
   audioUrl: string | null;
+  transcript: string | null;
   errorMessage: string | null;
 }
 
-export function ConversationPanel({ state, audioUrl, errorMessage }: ConversationPanelProps) {
+export function ConversationPanel({ state, audioUrl, transcript, errorMessage }: ConversationPanelProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const showPlayback = audioUrl !== null;
 
@@ -37,7 +38,12 @@ export function ConversationPanel({ state, audioUrl, errorMessage }: Conversatio
               Enviando...
             </p>
           )}
-          {state === "sent" && <p className={`${styles.text} ${styles.status}`}>Enviado ✓</p>}
+          {state === "sent" && (
+            <>
+              <p className={`${styles.text} ${styles.status}`}>Enviado ✓</p>
+              {transcript && <p className={styles.text}>{transcript}</p>}
+            </>
+          )}
           {state === "error" && errorMessage && (
             <p className={`${styles.text} ${styles.error}`}>{errorMessage}</p>
           )}

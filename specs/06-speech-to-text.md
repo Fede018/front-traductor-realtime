@@ -1,6 +1,6 @@
 # SPEC 06 — Speech-to-Text (OpenAI Whisper)
 
-> **Status:** Aprobado
+> **Status:** Implementado
 > **Depends on:** SPEC 05
 > **Date:** 2026-09-25
 > **Objective:** Transcribir el audio recibido en `POST /api/audio` usando la API de OpenAI (`whisper-1`) y devolver el texto real en la misma respuesta, sin traducir todavía.
@@ -76,12 +76,12 @@ export interface AudioUploadResponse {
 
 ## Acceptance criteria
 
-- [ ] `POST /api/audio` con un audio real devuelve `transcript` no vacío y coherente con lo dicho (verificación manual con audio de prueba).
-- [ ] `sourceLanguage` se pasa como pista de idioma en la llamada a OpenAI.
-- [ ] Si `OPENAI_API_KEY` falta, es inválida, o OpenAI no responde, el endpoint devuelve `500` con `ProblemDetail` claro, sin tumbar el backend ni exponer detalles internos del proveedor.
-- [ ] El frontend muestra la transcripción real en el panel de conversación (lado "Vos") después de subir el audio.
-- [ ] `mvn clean verify` (backend) y `npm run build` (frontend) pasan sin errores.
-- [ ] La API key no está hardcodeada en ningún archivo versionado (solo referenciada vía `${OPENAI_API_KEY}`).
+- [x] `POST /api/audio` con un audio real devuelve `transcript` no vacío y coherente con lo dicho (verificación manual con audio de prueba).
+- [x] `sourceLanguage` se pasa como pista de idioma en la llamada a OpenAI.
+- [x] Si `OPENAI_API_KEY` falta, es inválida, o OpenAI no responde, el endpoint devuelve `500` con `ProblemDetail` claro, sin tumbar el backend ni exponer detalles internos del proveedor.
+- [x] El frontend muestra la transcripción real en el panel de conversación (lado "Vos") después de subir el audio.
+- [x] `mvn clean verify` (backend) y `npm run build` (frontend) pasan sin errores.
+- [x] La API key no está hardcodeada en ningún archivo versionado (solo referenciada vía `${OPENAI_API_KEY}`).
 
 ## Decisiones
 
