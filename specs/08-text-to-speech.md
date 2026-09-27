@@ -1,6 +1,6 @@
 # SPEC 08 — Text-to-Speech (OpenAI) — primer flujo completo
 
-> **Status:** Draft
+> **Status:** Aprobado
 > **Depends on:** SPEC 07
 > **Date:** 2026-09-25
 > **Objective:** Generar el audio de la traducción con OpenAI TTS (`tts-1`), devolverlo en base64 en la misma respuesta y reproducirlo automáticamente en el frontend, cerrando el primer flujo completo voz→voz.
@@ -99,11 +99,11 @@ export interface AudioUploadResponse {
 
 ## Risks
 
-| Risk | Mitigation |
-|------|------------|
+| Risk                                                                                               | Mitigation                                                                                                                                                                            |
+| -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Autoplay bloqueado por la política del navegador (algunos navegadores exigen interacción reciente) | Botón manual "Reproducir traducción" de respaldo; en la práctica el usuario acaba de interactuar (soltó el botón de micrófono), lo que suele habilitar el autoplay en Chrome/Firefox. |
-| Tamaño de respuesta crece (audio + texto en la misma request) | Aceptado para audios cortos de conversación; se revisa si se vuelve un problema real de latencia. |
-| Costo triplicado de OpenAI por request (STT + traducción + TTS) | Aceptado en esta etapa; a monitorear manualmente igual que en SPEC 06/07. |
+| Tamaño de respuesta crece (audio + texto en la misma request)                                      | Aceptado para audios cortos de conversación; se revisa si se vuelve un problema real de latencia.                                                                                     |
+| Costo triplicado de OpenAI por request (STT + traducción + TTS)                                    | Aceptado en esta etapa; a monitorear manualmente igual que en SPEC 06/07.                                                                                                             |
 
 ## What is **not** in this spec
 

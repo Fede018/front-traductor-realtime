@@ -8,6 +8,7 @@ export interface AudioUploadResponse {
   targetLanguage: string;
   transcript: string;
   translation: string;
+  translationAudioBase64: string;
 }
 
 interface ProblemDetail {
