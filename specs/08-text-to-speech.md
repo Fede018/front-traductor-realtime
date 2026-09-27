@@ -1,6 +1,6 @@
 # SPEC 08 — Text-to-Speech (OpenAI) — primer flujo completo
 
-> **Status:** Draft
+> **Status:** Implementado
 > **Depends on:** SPEC 07
 > **Date:** 2026-09-25
 > **Objective:** Generar el audio de la traducción con OpenAI TTS (`tts-1`), devolverlo en base64 en la misma respuesta y reproducirlo automáticamente en el frontend, cerrando el primer flujo completo voz→voz.
@@ -82,12 +82,12 @@ export interface AudioUploadResponse {
 
 ## Acceptance criteria
 
-- [ ] `POST /api/audio` devuelve `translationAudioBase64` no vacío, decodificable a un mp3 válido que suena como la traducción.
-- [ ] Al recibir la respuesta en el frontend, el audio de la traducción se reproduce automáticamente sin acción manual del usuario.
-- [ ] Existe un botón "Reproducir traducción" que reproduce el mismo audio manualmente, para el caso en que el navegador bloquee el autoplay.
-- [ ] Si el TTS falla (API caída, key inválida, texto vacío), el endpoint devuelve `500` con `ProblemDetail` claro, sin tumbar el backend.
-- [ ] `mvn clean verify` (backend) y `npm run build` (frontend) pasan sin errores.
-- [ ] Flujo completo verificado manualmente: hablar en el idioma origen → se escucha automáticamente la traducción en el idioma destino, sin tocar nada más que el botón de micrófono.
+- [x] `POST /api/audio` devuelve `translationAudioBase64` no vacío, decodificable a un mp3 válido que suena como la traducción.
+- [x] Al recibir la respuesta en el frontend, el audio de la traducción se reproduce automáticamente sin acción manual del usuario.
+- [x] Existe un botón "Reproducir traducción" que reproduce el mismo audio manualmente, para el caso en que el navegador bloquee el autoplay.
+- [x] Si el TTS falla (API caída, key inválida, texto vacío), el endpoint devuelve `500` con `ProblemDetail` claro, sin tumbar el backend.
+- [x] `mvn clean verify` (backend) y `npm run build` (frontend) pasan sin errores.
+- [x] Flujo completo verificado manualmente: hablar en el idioma origen → se escucha automáticamente la traducción en el idioma destino, sin tocar nada más que el botón de micrófono.
 
 ## Decisiones
 
@@ -99,11 +99,11 @@ export interface AudioUploadResponse {
 
 ## Risks
 
-| Risk | Mitigation |
-|------|------------|
+| Risk                                                                                               | Mitigation                                                                                                                                                                            |
+| -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Autoplay bloqueado por la política del navegador (algunos navegadores exigen interacción reciente) | Botón manual "Reproducir traducción" de respaldo; en la práctica el usuario acaba de interactuar (soltó el botón de micrófono), lo que suele habilitar el autoplay en Chrome/Firefox. |
-| Tamaño de respuesta crece (audio + texto en la misma request) | Aceptado para audios cortos de conversación; se revisa si se vuelve un problema real de latencia. |
-| Costo triplicado de OpenAI por request (STT + traducción + TTS) | Aceptado en esta etapa; a monitorear manualmente igual que en SPEC 06/07. |
+| Tamaño de respuesta crece (audio + texto en la misma request)                                      | Aceptado para audios cortos de conversación; se revisa si se vuelve un problema real de latencia.                                                                                     |
+| Costo triplicado de OpenAI por request (STT + traducción + TTS)                                    | Aceptado en esta etapa; a monitorear manualmente igual que en SPEC 06/07.                                                                                                             |
 
 ## What is **not** in this spec
 

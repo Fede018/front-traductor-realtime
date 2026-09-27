@@ -8,6 +8,7 @@ export interface AudioUploadResponse {
   targetLanguage: string;
   transcript: string;
   translation: string;
+  translationAudioBase64: string;
 }
 
 interface ProblemDetail {
@@ -21,7 +22,7 @@ export async function uploadAudio(
   targetLanguage: LanguageCode
 ): Promise<AudioUploadResponse> {
   const formData = new FormData();
-  formData.append("audio", blob);
+  formData.append("audio", blob, "audio.webm");
   formData.append("sourceLanguage", sourceLanguage);
   formData.append("targetLanguage", targetLanguage);
 
