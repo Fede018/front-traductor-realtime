@@ -1,6 +1,7 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Loader2, Volume2 } from "lucide-react";
 import type { InteractionState } from "../../hooks/useVoiceRecorder";
+import { base64ToObjectUrl } from "../../utils/audio";
 import styles from "./ConversationPanel.module.css";
 
 interface ConversationPanelProps {
@@ -8,16 +9,48 @@ interface ConversationPanelProps {
   audioUrl: string | null;
   transcript: string | null;
   translation: string | null;
+  translationAudioBase64: string | null;
   errorMessage: string | null;
 }
 
-export function ConversationPanel({ state, audioUrl, transcript, translation, errorMessage }: ConversationPanelProps) {
+export function ConversationPanel({
+  state,
+  audioUrl,
+  transcript,
+  translation,
+  translationAudioBase64,
+  errorMessage,
+}: ConversationPanelProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
+  const translationAudioRef = useRef<HTMLAudioElement>(null);
+  const [translationAudioUrl, setTranslationAudioUrl] = useState<string | null>(null);
   const showPlayback = audioUrl !== null;
 
   const handlePlay = () => {
     audioRef.current?.play();
   };
+
+  const handlePlayTranslation = () => {
+    translationAudioRef.current?.play();
+  };
+
+  useEffect(() => {
+    if (!translationAudioBase64) {
+      setTranslationAudioUrl(null);
+      return;
+    }
+    const url = base64ToObjectUrl(translationAudioBase64, "audio/mpeg");
+    setTranslationAudioUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [translationAudioBase64]);
+
+  useEffect(() => {
+    if (translationAudioUrl) {
+      translationAudioRef.current?.play().catch(() => {
+        // autoplay bloqueado por el navegador: queda el botón manual de respaldo
+      });
+    }
+  }, [translationAudioUrl]);
 
   return (
     <div className={styles.panel}>
@@ -61,6 +94,13 @@ export function ConversationPanel({ state, audioUrl, transcript, translation, er
           ) : (
             <p className={`${styles.text} ${styles.placeholder}`}>—</p>
           )}
+          {translationAudioUrl && (
+            <button type="button" className={styles.playButton} onClick={handlePlayTranslation}>
+              <Volume2 size={16} />
+              Reproducir traducción
+            </button>
+          )}
+          {translationAudioUrl && <audio ref={translationAudioRef} src={translationAudioUrl} />}
         </div>
       </div>
     </div>

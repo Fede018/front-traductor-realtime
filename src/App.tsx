@@ -20,6 +20,7 @@ function App() {
         audioUrl={audioUrl}
         transcript={uploadResult?.transcript ?? null}
         translation={uploadResult?.translation ?? null}
+        translationAudioBase64={uploadResult?.translationAudioBase64 ?? null}
         errorMessage={errorMessage}
       />
     </div>
