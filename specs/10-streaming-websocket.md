@@ -1,6 +1,6 @@
 # SPEC 10 — Transporte por WebSocket (streaming de audio)
 
-> **Status:** Draft
+> **Status:** Aprobado
 > **Depends on:** SPEC 05, SPEC 06, SPEC 07, SPEC 08, SPEC 09
 > **Date:** 2026-09-25
 > **Objective:** Reemplazar el transporte HTTP POST del audio (SPEC 05) por streaming binario sobre WebSocket, para que la subida empiece mientras la persona todavía está hablando, sin cambiar todavía el momento en que se dispara el procesamiento (STT/traducción/TTS sigue disparando al soltar el botón).
@@ -46,7 +46,7 @@ Mensajes servidor→cliente (WebSocket):
 ```ts
 // TEXT, JSON
 type ServerMessage =
-  | ({ type: "result" } & AudioUploadResponse)  // mismo shape que SPEC 08
+  | ({ type: "result" } & AudioUploadResponse) // mismo shape que SPEC 08
   | { type: "error"; detail: string };
 ```
 
@@ -97,10 +97,10 @@ public AudioUploadResponse process(byte[] audioBytes, String contentType,
 
 ## Risks
 
-| Risk | Mitigation |
-|------|------------|
-| El WebSocket se corta en medio del audio y se pierde el turno | Estado de error explícito + reintento manual; el usuario vuelve a grabar. |
-| El buffer de audio acumulado por sesión activa en el backend puede crecer si el turno es muy largo | Mismo límite de 10MB que SPEC 05, validado incrementalmente al recibir cada chunk binario. |
+| Risk                                                                                                                             | Mitigation                                                                                                            |
+| -------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| El WebSocket se corta en medio del audio y se pierde el turno                                                                    | Estado de error explícito + reintento manual; el usuario vuelve a grabar.                                             |
+| El buffer de audio acumulado por sesión activa en el backend puede crecer si el turno es muy largo                               | Mismo límite de 10MB que SPEC 05, validado incrementalmente al recibir cada chunk binario.                            |
 | Mezclar mensajes de texto (`start`/`stop`) y binarios (chunks) en la misma conexión requiere discriminar bien el tipo de mensaje | El campo `type` en los mensajes de texto los distingue claramente; los mensajes binarios nunca llevan ese envoltorio. |
 
 ## What is **not** in this spec
