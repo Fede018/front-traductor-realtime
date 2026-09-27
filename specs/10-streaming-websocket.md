@@ -1,6 +1,6 @@
 # SPEC 10 — Transporte por WebSocket (streaming de audio)
 
-> **Status:** Draft
+> **Status:** Implementado
 > **Depends on:** SPEC 05, SPEC 06, SPEC 07, SPEC 08, SPEC 09
 > **Date:** 2026-09-25
 > **Objective:** Reemplazar el transporte HTTP POST del audio (SPEC 05) por streaming binario sobre WebSocket, para que la subida empiece mientras la persona todavía está hablando, sin cambiar todavía el momento en que se dispara el procesamiento (STT/traducción/TTS sigue disparando al soltar el botón).
@@ -46,7 +46,7 @@ Mensajes servidor→cliente (WebSocket):
 ```ts
 // TEXT, JSON
 type ServerMessage =
-  | ({ type: "result" } & AudioUploadResponse)  // mismo shape que SPEC 08
+  | ({ type: "result" } & AudioUploadResponse) // mismo shape que SPEC 08
   | { type: "error"; detail: string };
 ```
 
@@ -76,14 +76,14 @@ public AudioUploadResponse process(byte[] audioBytes, String contentType,
 
 ## Acceptance criteria
 
-- [ ] El frontend abre una conexión WebSocket a `/ws/audio` y la reutiliza entre turnos (no abre una nueva por cada grabación).
-- [ ] Al grabar y soltar el mic, el audio viaja como chunks binarios de ~250ms por WebSocket, no como un `POST` multipart.
-- [ ] El backend responde por el mismo WebSocket con un mensaje `result` que incluye `transcript`/`translation`/`translationAudioBase64`, usando la misma lógica de SPEC 06-08.
-- [ ] `POST /api/audio` (REST, SPEC 05-08) sigue funcionando exactamente igual que antes, sin regresión, aunque el frontend ya no lo use.
-- [ ] Si la conexión se corta a mitad de un turno, la UI pasa a estado de error y permite reintentar grabando de nuevo.
-- [ ] Un turno que acumula más de 10MB de audio recibe un mensaje `error` sin intentar procesarlo.
-- [ ] La reproducción local del propio audio grabado (SPEC 04) sigue funcionando igual.
-- [ ] `mvn clean verify` (backend) y `npm run build` (frontend) pasan sin errores.
+- [x] El frontend abre una conexión WebSocket a `/ws/audio` y la reutiliza entre turnos (no abre una nueva por cada grabación).
+- [x] Al grabar y soltar el mic, el audio viaja como chunks binarios de ~250ms por WebSocket, no como un `POST` multipart.
+- [x] El backend responde por el mismo WebSocket con un mensaje `result` que incluye `transcript`/`translation`/`translationAudioBase64`, usando la misma lógica de SPEC 06-08.
+- [x] `POST /api/audio` (REST, SPEC 05-08) sigue funcionando exactamente igual que antes, sin regresión, aunque el frontend ya no lo use.
+- [x] Si la conexión se corta a mitad de un turno, la UI pasa a estado de error y permite reintentar grabando de nuevo.
+- [x] Un turno que acumula más de 10MB de audio recibe un mensaje `error` sin intentar procesarlo.
+- [x] La reproducción local del propio audio grabado (SPEC 04) sigue funcionando igual.
+- [x] `mvn clean verify` (backend) y `npm run build` (frontend) pasan sin errores.
 
 ## Decisiones
 
@@ -97,10 +97,10 @@ public AudioUploadResponse process(byte[] audioBytes, String contentType,
 
 ## Risks
 
-| Risk | Mitigation |
-|------|------------|
-| El WebSocket se corta en medio del audio y se pierde el turno | Estado de error explícito + reintento manual; el usuario vuelve a grabar. |
-| El buffer de audio acumulado por sesión activa en el backend puede crecer si el turno es muy largo | Mismo límite de 10MB que SPEC 05, validado incrementalmente al recibir cada chunk binario. |
+| Risk                                                                                                                             | Mitigation                                                                                                            |
+| -------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| El WebSocket se corta en medio del audio y se pierde el turno                                                                    | Estado de error explícito + reintento manual; el usuario vuelve a grabar.                                             |
+| El buffer de audio acumulado por sesión activa en el backend puede crecer si el turno es muy largo                               | Mismo límite de 10MB que SPEC 05, validado incrementalmente al recibir cada chunk binario.                            |
 | Mezclar mensajes de texto (`start`/`stop`) y binarios (chunks) en la misma conexión requiere discriminar bien el tipo de mensaje | El campo `type` en los mensajes de texto los distingue claramente; los mensajes binarios nunca llevan ese envoltorio. |
 
 ## What is **not** in this spec
