@@ -4,11 +4,19 @@ import type { LanguagePair } from "../types/language";
 
 export type RealtimeModeStatus = "idle" | "connecting" | "active" | "error";
 
+interface RealtimeEvent {
+  type: string;
+  transcript?: string;
+  delta?: string;
+}
+
 const REALTIME_CALLS_URL = "https://api.openai.com/v1/realtime/calls";
 
 export function useRealtimeMode(languagePair: LanguagePair) {
   const [status, setStatus] = useState<RealtimeModeStatus>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [liveUserTranscript, setLiveUserTranscript] = useState("");
+  const [liveTranslation, setLiveTranslation] = useState("");
 
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
   const dataChannelRef = useRef<RTCDataChannel | null>(null);
@@ -26,6 +34,27 @@ export function useRealtimeMode(languagePair: LanguagePair) {
     streamRef.current = null;
     if (audioElementRef.current) {
       audioElementRef.current.srcObject = null;
+    }
+    setLiveUserTranscript("");
+    setLiveTranslation("");
+  }, []);
+
+  const handleServerEvent = useCallback((event: RealtimeEvent) => {
+    switch (event.type) {
+      case "conversation.item.input_audio_transcription.delta":
+        setLiveUserTranscript((prev) => prev + (event.delta ?? ""));
+        break;
+      case "conversation.item.input_audio_transcription.completed":
+        setLiveUserTranscript(event.transcript ?? "");
+        break;
+      case "response.output_audio_transcript.delta":
+        setLiveTranslation((prev) => prev + (event.delta ?? ""));
+        break;
+      case "response.output_audio_transcript.done":
+        setLiveTranslation(event.transcript ?? "");
+        break;
+      default:
+        break;
     }
   }, []);
 
@@ -58,6 +87,13 @@ export function useRealtimeMode(languagePair: LanguagePair) {
       };
 
       const dataChannel = peerConnection.createDataChannel("oai-events");
+      dataChannel.onmessage = (messageEvent) => {
+        try {
+          handleServerEvent(JSON.parse(messageEvent.data) as RealtimeEvent);
+        } catch {
+          // evento no parseable, se ignora
+        }
+      };
       dataChannelRef.current = dataChannel;
 
       const offer = await peerConnection.createOffer();
@@ -85,9 +121,9 @@ export function useRealtimeMode(languagePair: LanguagePair) {
       setErrorMessage(error instanceof Error ? error.message : "No se pudo activar el modo tiempo real.");
       setStatus("error");
     }
-  }, [cleanup]);
+  }, [cleanup, handleServerEvent]);
 
   useEffect(() => cleanup, [cleanup]);
 
-  return { status, errorMessage, enable, disable };
+  return { status, errorMessage, liveUserTranscript, liveTranslation, enable, disable };
 }
